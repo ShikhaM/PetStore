@@ -22,7 +22,6 @@
                 <th><?= $this->Paginator->sort('description') ?></th>
                 <th><?= $this->Paginator->sort('colour') ?></th>
                 <th><?= $this->Paginator->sort('collection_location') ?></th>
-                <th><?= $this->Paginator->sort('image_url') ?></th>
                 <th class="actions"><?= __('Actions') ?></th>
             </tr>
         </thead>
@@ -40,7 +39,6 @@
                 <td><?= h($petDetail->description) ?></td>
                 <td><?= h($petDetail->colour) ?></td>
                 <td><?= h($petDetail->collection_location) ?></td>
-                <td><?= h($petDetail->image_url) ?></td>
                 <td class="actions">
                     <?= $this->Html->link(__('View'), ['action' => 'view', $petDetail->id]) ?>
                     <?= $this->Html->link(__('Edit'), ['action' => 'edit', $petDetail->id]) ?>
