@@ -2,6 +2,7 @@
 namespace App\Controller;
 
 use App\Controller\AppController;
+use Cake\Datasource\ConnectionManager;
 
 /**
  * Users Controller
@@ -127,6 +128,43 @@ class UsersController extends AppController
         return $this->redirect($this->Auth->logout());
     }
 
+    private function GUID()
+    {
+    if (function_exists('com_create_guid') === true)
+        {
+        return trim(com_create_guid(), '{}');
+        }
+
+        return sprintf('%04X%04X-%04X-%04X-%04X-%04X%04X%04X', mt_rand(0, 65535), mt_rand(0, 65535), mt_rand(0, 65535), mt_rand(16384, 20479), mt_rand(32768, 49151), mt_rand(0, 65535), mt_rand(0, 65535), mt_rand(0, 65535));
+    }
+    
+    // Restful Login Method
+    public function restfullogin() {
+
+        if($this->request->is('post')){
+            $user = $this->Auth->identify();
+            if($user){
+                
+                $sessiontoken = $this->GUID(); 
+                $userid = $user['id'];
+                $insertquery = "insert into login_session(user_id, start_time, session_token)  values ($userid, now(), '$sessiontoken');";
+                $connection = ConnectionManager::get('default');
+                $results = $connection->execute($insertquery );
+
+                // $sessiontoken = $insertquery; // uncomment this line for the result to show the sql query
+
+                $this->Auth->setUser($user);               
+                $this->set(compact('sessiontoken'));
+                $this->set('_serialize', ['sessiontoken']);                
+               
+            } else {
+
+            // Login Error
+             $this->set('_serialize', []);
+            }
+        }
+    }
+
     // Register Method
     public function register()
     {
@@ -149,5 +187,6 @@ class UsersController extends AppController
     // beforeFilter Method
     public function beforeFilter(\Cake\Event\Event $event){
         $this->Auth->allow(['register']);
+        $this->Auth->allow(['restfullogin']);
     }
 }

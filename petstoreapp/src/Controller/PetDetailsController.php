@@ -2,6 +2,7 @@
 namespace App\Controller;
 
 use App\Controller\AppController;
+use Cake\Datasource\ConnectionManager;
 
 /**
  * PetDetails Controller
@@ -66,6 +67,37 @@ class PetDetailsController extends AppController
         $this->set('_serialize', ['petDetail']);
     }
 
+    public function restfuladd()
+    {
+        $petDetail = $this->PetDetails->newEntity();
+        if ($this->request->is('post')) {
+            $sessiontoken  = $this->request->data['session_token'];
+            
+            $aquery = "select user_id from login_session where session_token='$sessiontoken'";
+            $connection = ConnectionManager::get('default');
+            $stmt = $connection->execute($aquery);
+           
+            if ($stmt->rowCount() == 1) {
+              $row = $stmt->fetch();
+              $userid = $row[0];
+             
+              unset($this->request->data['session_token']);
+              $this->request->data['user_id'] = $userid;
+
+              $petDetail = $this->PetDetails->patchEntity($petDetail, $this->request->data);
+              if ($this->PetDetails->save($petDetail)) {
+                $this->set(compact('petDetail'));
+                $this->set('_serialize', ['petDetail']);
+              } else {
+                $this->set('_serialize', []);
+              }
+            } else {
+                $this->set('_serialize', []);
+              }
+        }
+       
+    }
+
     /**
      * Edit method
      *
@@ -109,5 +141,10 @@ class PetDetailsController extends AppController
             $this->Flash->error(__('The pet detail could not be deleted. Please, try again.'));
         }
         return $this->redirect(['action' => 'index']);
+    }
+
+    // beforeFilter Method
+    public function beforeFilter(\Cake\Event\Event $event){
+        $this->Auth->allow(['restfuladd']);
     }
 }
