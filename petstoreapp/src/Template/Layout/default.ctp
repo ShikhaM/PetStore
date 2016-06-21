@@ -41,10 +41,21 @@ $cakeDescription = 'CakePHP: the rapid development php framework';
             </li>
         </ul>
         <div class="top-bar-section">
+    <!-- Right Nav Section -->
             <ul class="right">
-                <li><a target="_blank" href="http://book.cakephp.org/3.0/">Documentation</a></li>
-                <li><a target="_blank" href="http://api.cakephp.org/3.0/">API</a></li>
+            <?php if($loggedIn) : ?>
+            <li><?= $this->Html->link(__('Logout'), ['controller' => 'users', 'action' => 'logout']); ?></li>
+                
             </ul>
+    <!-- Left Nav Section -->
+        <ul class="left">
+        <li><?= $this->Html->link(__('PetDetails'), ['controller' => 'PetDetails', 'action' => 'index']); ?></li>
+
+        <?php else : ?>
+        <li><?= $this->Html->link(__('Login'), ['controller' => 'users', 'action' => 'login']); ?></li>
+        <li><?= $this->Html->link(__('Register'), ['controller' => 'users', 'action' => 'register']); ?></li>
+        <?php endif; ?>
+        </ul>
         </div>
     </nav>
     <?= $this->Flash->render() ?>
